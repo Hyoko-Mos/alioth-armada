@@ -1,0 +1,828 @@
+dtbo: total=13414990 entries=29 ent_size=32 off=32
+[0] off=960 size=480558 id=0x0 model='Qualcomm Technologies, Inc. xiaomi dagu' matches=8
+//fragment@137/__overlay__/cs35l41@41
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x4e 0x0
+    reg = 0x41
+    interrupt-parent = 0xffffffff
+    interrupts = 0x5c 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 544c00
+    cirrus,fast-switch = 544c2d6d757369632e74787400544c2d766f6963652e74787400544c2d766f69702e74787400544c2d6d6973632e74787400
+//fragment@137/__overlay__/cs35l41@41/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@137/__overlay__/cs35l41@43
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x90 0x0
+    reg = 0x43
+    interrupt-parent = 0xffffffff
+    interrupts = 0x81 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 545200
+    cirrus,fast-switch = 54522d6d757369632e7478740054522d766f6963652e7478740054522d766f69702e7478740054522d6d6973632e74787400
+//fragment@137/__overlay__/cs35l41@43/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@138/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x6 0x0
+    reg = 0x40
+    interrupt-parent = 0xffffffff
+    interrupts = 0x7 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 425200
+    cirrus,fast-switch = 42522d6d757369632e7478740042522d766f6963652e7478740042522d766f69702e7478740042522d6d6973632e74787400
+//fragment@138/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@138/__overlay__/cs35l41@41
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x3e 0x0
+    reg = 0x41
+    interrupt-parent = 0xffffffff
+    interrupts = 0x43 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,right-channel-amp = <empty>
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 424c00
+    cirrus,fast-switch = 424c2d6d757369632e74787400424c2d766f6963652e74787400424c2d766f69702e74787400424c2d6d6973632e74787400
+//fragment@138/__overlay__/cs35l41@41/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[1] off=481518 size=482118 id=0x0 model='Qualcomm Technologies, Inc. xiaomi psyche' matches=4
+//fragment@119/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x40
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b657200
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x71 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    cirrus,right-channel-amp = <empty>
+//fragment@119/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@119/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x42
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b65725f 0x72637600
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0xf 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    sound-name-prefix = 0x52435600
+//fragment@119/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[2] off=963636 size=451687 id=0x0 model='Qualcomm Technologies, Inc. kona AR Glass' matches=0
+[3] off=1415323 size=487492 id=0x0 model='Qualcomm Technologies, Inc. xiaomi enuma' matches=16
+//fragment@132/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x32 0x0
+    reg = 0x40
+    interrupt-parent = 0xffffffff
+    interrupts = 0x1b 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x54524800
+    cirrus,fast-switch = 5452482d6d757369632e747874005452482d766f6963652e747874005452482d766f69702e747874005452482d6d6973632e74787400
+//fragment@132/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@132/__overlay__/cs35l41@41
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x4e 0x0
+    reg = 0x41
+    interrupt-parent = 0xffffffff
+    interrupts = 0x5c 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x544c4800
+    cirrus,fast-switch = 544c482d6d757369632e74787400544c482d766f6963652e74787400544c482d766f69702e74787400544c482d6d6973632e74787400
+//fragment@132/__overlay__/cs35l41@41/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@132/__overlay__/cs35l41@43
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x90 0x0
+    reg = 0x43
+    interrupt-parent = 0xffffffff
+    interrupts = 0x81 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x54524c00
+    cirrus,fast-switch = 54524c2d6d757369632e7478740054524c2d766f6963652e7478740054524c2d766f69702e7478740054524c2d6d6973632e74787400
+//fragment@132/__overlay__/cs35l41@43/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@132/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x1e 0x0
+    reg = 0x42
+    interrupt-parent = 0xffffffff
+    interrupts = 0x70 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,right-channel-amp = <empty>
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x544c4c00
+    cirrus,fast-switch = 544c4c2d6d757369632e74787400544c4c2d766f6963652e74787400544c4c2d766f69702e74787400544c4c2d6d6973632e74787400
+//fragment@132/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@133/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x6 0x0
+    reg = 0x40
+    interrupt-parent = 0xffffffff
+    interrupts = 0x7 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x42524800
+    cirrus,fast-switch = 4252482d6d757369632e747874004252482d766f6963652e747874004252482d766f69702e747874004252482d6d6973632e74787400
+//fragment@133/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@133/__overlay__/cs35l41@41
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x3e 0x0
+    reg = 0x41
+    interrupt-parent = 0xffffffff
+    interrupts = 0x43 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,right-channel-amp = <empty>
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x424c4800
+    cirrus,fast-switch = 424c482d6d757369632e74787400424c482d766f6963652e74787400424c482d766f69702e74787400424c482d6d6973632e74787400
+//fragment@133/__overlay__/cs35l41@41/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@133/__overlay__/cs35l41@43
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x31 0x0
+    reg = 0x43
+    interrupt-parent = 0xffffffff
+    interrupts = 0x7e 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x424c4c00
+    cirrus,fast-switch = 424c4c2d6d757369632e74787400424c4c2d766f6963652e74787400424c4c2d766f69702e74787400424c4c2d6d6973632e74787400
+//fragment@133/__overlay__/cs35l41@43/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@133/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x45 0x0
+    reg = 0x42
+    interrupt-parent = 0xffffffff
+    interrupts = 0x64 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x42524c00
+    cirrus,fast-switch = 42524c2d6d757369632e7478740042524c2d766f6963652e7478740042524c2d766f69702e7478740042524c2d6d6973632e74787400
+//fragment@133/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[4] off=1902815 size=444694 id=0x0 model='Qualcomm Technologies, Inc. kona MTP (WS)' matches=0
+[5] off=2347509 size=448391 id=0x0 model='Qualcomm Technologies, Inc. kona CDP (LCD)' matches=0
+[6] off=2795900 size=463565 id=0x0 model='Qualcomm Technologies, Inc. xiaomi skuld' matches=4
+//fragment@109/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x40
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b657200
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x71 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    cirrus,right-channel-amp = <empty>
+//fragment@109/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@109/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x42
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b65725f 0x72637600
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x70 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    sound-name-prefix = 0x52435600
+//fragment@109/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[7] off=3259465 size=375210 id=0x0 model='Qualcomm Technologies, Inc. kona RUMI' matches=0
+[8] off=3634675 size=477960 id=0x0 model='Qualcomm Technologies, Inc. xiaomi lmi' matches=0
+[9] off=4112635 size=429732 id=0x0 model='Qualcomm Technologies, Inc. XR kona Standalone' matches=0
+[10] off=4542367 size=452461 id=0x0 model='Qualcomm Technologies, Inc. xiaomi verthandi' matches=4
+//fragment@108/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x40
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b657200
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x71 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    cirrus,right-channel-amp = <empty>
+//fragment@108/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@108/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x42
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b65725f 0x72637600
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x70 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    sound-name-prefix = 0x52435600
+//fragment@108/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[11] off=4994828 size=493461 id=0x0 model='Qualcomm Technologies, Inc. xiaomi cas' matches=4
+//fragment@112/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x40
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b657200
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x71 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,right-channel-amp = <empty>
+//fragment@112/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@112/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x42
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b65725f 0x72637600
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x70 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    sound-name-prefix = 0x52435600
+//fragment@112/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[12] off=5488289 size=489184 id=0x0 model='Qualcomm Technologies, Inc. xiaomi elish' matches=16
+//fragment@134/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x32 0x0
+    reg = 0x40
+    interrupt-parent = 0xffffffff
+    interrupts = 0x1b 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x54524800
+    cirrus,fast-switch = 5452482d6d757369632e747874005452482d766f6963652e747874005452482d766f69702e747874005452482d6d6973632e74787400
+//fragment@134/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@134/__overlay__/cs35l41@41
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x4e 0x0
+    reg = 0x41
+    interrupt-parent = 0xffffffff
+    interrupts = 0x5c 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x544c4800
+    cirrus,fast-switch = 544c482d6d757369632e74787400544c482d766f6963652e74787400544c482d766f69702e74787400544c482d6d6973632e74787400
+//fragment@134/__overlay__/cs35l41@41/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@134/__overlay__/cs35l41@43
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x90 0x0
+    reg = 0x43
+    interrupt-parent = 0xffffffff
+    interrupts = 0x81 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x54524c00
+    cirrus,fast-switch = 54524c2d6d757369632e7478740054524c2d766f6963652e7478740054524c2d766f69702e7478740054524c2d6d6973632e74787400
+//fragment@134/__overlay__/cs35l41@43/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@134/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x1e 0x0
+    reg = 0x42
+    interrupt-parent = 0xffffffff
+    interrupts = 0x70 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,right-channel-amp = <empty>
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x544c4c00
+    cirrus,fast-switch = 544c4c2d6d757369632e74787400544c4c2d766f6963652e74787400544c4c2d766f69702e74787400544c4c2d6d6973632e74787400
+//fragment@134/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@135/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x6 0x0
+    reg = 0x40
+    interrupt-parent = 0xffffffff
+    interrupts = 0x7 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x42524800
+    cirrus,fast-switch = 4252482d6d757369632e747874004252482d766f6963652e747874004252482d766f69702e747874004252482d6d6973632e74787400
+//fragment@135/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@135/__overlay__/cs35l41@41
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x3e 0x0
+    reg = 0x41
+    interrupt-parent = 0xffffffff
+    interrupts = 0x43 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,right-channel-amp = <empty>
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x424c4800
+    cirrus,fast-switch = 424c482d6d757369632e74787400424c482d766f6963652e74787400424c482d766f69702e74787400424c482d6d6973632e74787400
+//fragment@135/__overlay__/cs35l41@41/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@135/__overlay__/cs35l41@43
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x31 0x0
+    reg = 0x43
+    interrupt-parent = 0xffffffff
+    interrupts = 0x7e 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x424c4c00
+    cirrus,fast-switch = 424c4c2d6d757369632e74787400424c4c2d766f6963652e74787400424c4c2d766f69702e74787400424c4c2d6d6973632e74787400
+//fragment@135/__overlay__/cs35l41@43/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@135/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x45 0x0
+    reg = 0x42
+    interrupt-parent = 0xffffffff
+    interrupts = 0x64 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 0x42524c00
+    cirrus,fast-switch = 42524c2d6d757369632e7478740042524c2d766f6963652e7478740042524c2d766f69702e7478740042524c2d6d6973632e74787400
+//fragment@135/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[13] off=5977473 size=491010 id=0x0 model='Qualcomm Technologies, Inc. xiaomi poussin' matches=0
+[14] off=6468483 size=454980 id=0x0 model='Qualcomm Technologies, Inc. kona HDK' matches=0
+[15] off=6923463 size=426436 id=0x0 model='Qualcomm Technologies, Inc. kona XR 5G Fusion' matches=0
+[16] off=7349899 size=444437 id=0x0 model='Qualcomm Technologies, Inc. kona MTP' matches=0
+[17] off=7794336 size=488389 id=0x0 model='Qualcomm Technologies, Inc. xiaomi munch' matches=0
+[18] off=8282725 size=451399 id=0x0 model='Qualcomm Technologies, Inc. kona QRD' matches=0
+[19] off=8734124 size=447681 id=0x0 model='Qualcomm Technologies, Inc. kona CDP' matches=0
+[20] off=9181805 size=486248 id=0x0 model='Qualcomm Technologies, Inc. xiaomi cmi' matches=4
+//fragment@113/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x40
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b657200
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x71 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    cirrus,right-channel-amp = <empty>
+//fragment@113/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@113/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x42
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b65725f 0x72637600
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x70 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    sound-name-prefix = 0x52435600
+//fragment@113/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[21] off=9668053 size=484869 id=0x0 model='Qualcomm Technologies, Inc. xiaomi thyme' matches=4
+//fragment@114/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x40
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b657200
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x71 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    cirrus,right-channel-amp = <empty>
+//fragment@114/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@114/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x42
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b65725f 0x72637600
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x70 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    sound-name-prefix = 0x52435600
+//fragment@114/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[22] off=10152922 size=427529 id=0x0 model='Qualcomm Technologies, Inc. kona XR 5G UltraSound' matches=0
+[23] off=10580451 size=484173 id=0x0 model='Qualcomm Technologies, Inc. xiaomi alioth' matches=4
+//fragment@127/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x40
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b657200
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x71 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    sound-name-prefix = 0x52435600
+//fragment@127/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@127/__overlay__/cs35l41@41
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x41
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b65725f 0x72637600
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x70 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,right-channel-amp = <empty>
+    cirrus,asp-sdout-hiz = 0x3
+//fragment@127/__overlay__/cs35l41@41/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[24] off=11064624 size=486968 id=0x0 model='Qualcomm Technologies, Inc. xiaomi umi' matches=4
+//fragment@113/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x40
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b657200
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x71 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    cirrus,right-channel-amp = <empty>
+//fragment@113/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@113/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x42
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b65725f 0x72637600
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x70 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    sound-name-prefix = 0x52435600
+//fragment@113/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[25] off=11551592 size=452453 id=0x0 model='Qualcomm Technologies, Inc. xiaomi urd' matches=4
+//fragment@108/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x40
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b657200
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x71 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    cirrus,right-channel-amp = <empty>
+//fragment@108/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@108/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x42
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b65725f 0x72637600
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x70 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x1
+    sound-name-prefix = 0x52435600
+//fragment@108/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[26] off=12004045 size=485821 id=0x0 model='Qualcomm Technologies, Inc. xiaomi apollo' matches=4
+//fragment@121/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x40
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b657200
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x71 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,right-channel-amp = <empty>
+//fragment@121/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@121/__overlay__/cs35l41@42
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x72 0x0
+    reg = 0x42
+    pinctrl-names = 0x63733335 0x6c34315f 0x6972715f 0x73706561 0x6b65725f 0x72637600
+    pinctrl-0 = 0xffffffff
+    interrupt-parent = 0xffffffff
+    interrupts = 0x70 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    sound-name-prefix = 0x52435600
+//fragment@121/__overlay__/cs35l41@42/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[27] off=12489866 size=480558 id=0x0 model='Qualcomm Technologies, Inc. xiaomi pipa' matches=8
+//fragment@137/__overlay__/cs35l41@41
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x4e 0x0
+    reg = 0x41
+    interrupt-parent = 0xffffffff
+    interrupts = 0x5c 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 544c00
+    cirrus,fast-switch = 544c2d6d757369632e74787400544c2d766f6963652e74787400544c2d766f69702e74787400544c2d6d6973632e74787400
+//fragment@137/__overlay__/cs35l41@41/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@137/__overlay__/cs35l41@43
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x90 0x0
+    reg = 0x43
+    interrupt-parent = 0xffffffff
+    interrupts = 0x81 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 545200
+    cirrus,fast-switch = 54522d6d757369632e7478740054522d766f6963652e7478740054522d766f69702e7478740054522d6d6973632e74787400
+//fragment@137/__overlay__/cs35l41@43/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@138/__overlay__/cs35l41@40
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x6 0x0
+    reg = 0x40
+    interrupt-parent = 0xffffffff
+    interrupts = 0x7 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 425200
+    cirrus,fast-switch = 42522d6d757369632e7478740042522d766f6963652e7478740042522d766f69702e7478740042522d6d6973632e74787400
+//fragment@138/__overlay__/cs35l41@40/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+//fragment@138/__overlay__/cs35l41@41
+    #sound-dai-cells = 0x1
+    compatible = 6369727275732c637333356c343100
+    reset-gpios = 0xffffffff 0x3e 0x0
+    reg = 0x41
+    interrupt-parent = 0xffffffff
+    interrupts = 0x43 0x8
+    cirrus,temp-warn_threshold = 0x3
+    cirrus,boost-peak-milliamp = 0xfa0
+    cirrus,boost-ind-nanohenry = 0x3e8
+    cirrus,boost-cap-microfarad = 0xf
+    cirrus,right-channel-amp = <empty>
+    cirrus,asp-sdout-hiz = 0x3
+    cirrus,tuning-has-prefix = <empty>
+    sound-name-prefix = 424c00
+    cirrus,fast-switch = 424c2d6d757369632e74787400424c2d766f6963652e74787400424c2d766f69702e74787400424c2d6d6973632e74787400
+//fragment@138/__overlay__/cs35l41@41/cirrus,gpio-config2
+    cirrus,gpio-src-select = 0x4
+    cirrus,gpio-output-enable = <empty>
+[28] off=12970424 size=444566 id=0x0 model='Qualcomm Technologies, Inc. kona standalone MTP' matches=0

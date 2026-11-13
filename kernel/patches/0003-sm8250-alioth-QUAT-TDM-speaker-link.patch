@@ -1,0 +1,127 @@
+--- sound/soc/qcom/sm8250.c	2026-11-13 17:15:39.758311530 +0800
++++ sound/soc/qcom/sm8250.c	2026-11-13 20:03:55.680398416 +0800
+@@ -3,6 +3,7 @@
+ 
+ #include <dt-bindings/sound/qcom,q6afe.h>
+ #include <linux/module.h>
++#include <linux/moduleparam.h>
+ #include <linux/platform_device.h>
+ #include <sound/soc.h>
+ #include <sound/soc-dapm.h>
+@@ -18,9 +19,54 @@
+ #define DRIVER_NAME		"sm8250"
+ #define MI2S_BCLK_RATE		1536000
+ #define TDM_BCLK_RATE		12288000
++/* Vendor DTBO: QUAT TDM BCLK = 0x177000 (1536000), not 12.288MHz */
++#define QUAT_TDM_BCLK_RATE	1536000
+ 
+ static unsigned int tdm_slot_offset[8] = {0, 4, 8, 12, 16, 20, 24, 28};
+ 
++/* QUAT TDM experiments (hot-tunable, applied on top of vendor-mirror config) */
++static int exp_tdm_rate = QUAT_TDM_BCLK_RATE;
++module_param(exp_tdm_rate, int, 0644);
++MODULE_PARM_DESC(exp_tdm_rate, "QUAD_TDM_IBIT vote rate (default 1536000 per vendor DTBO)");
++static int exp_tdm_attr;	/* 0=INVERT(default per upstream) 1=COUPLE_NO */
++module_param(exp_tdm_attr, int, 0644);
++MODULE_PARM_DESC(exp_tdm_attr, "QUAD_TDM_IBIT vote attr: 0=INVERT_COUPLE_NO 1=COUPLE_NO");
++
++static uint32_t exp_core_handles[2];
++static bool exp_core_voted;
++
++static void sm8250_exp_tdm_vote(struct snd_soc_pcm_runtime *rtd,
++				struct snd_soc_dai *cpu_dai)
++{
++	struct q6afe_port *port;
++	int attr = exp_tdm_attr ? Q6AFE_LPASS_CLK_ATTRIBUTE_COUPLE_NO
++				: Q6AFE_LPASS_CLK_ATTRIBUTE_INVERT_COUPLE_NO;
++	int ret;
++
++	port = q6afe_port_get_from_id(cpu_dai->dev, QUATERNARY_TDM_RX_0);
++	if (IS_ERR(port)) {
++		dev_err(rtd->dev, "exp: quat tdm port get failed %ld\n", PTR_ERR(port));
++		return;
++	}
++	ret = q6afe_port_set_sysclk(port, Q6AFE_LPASS_CLK_ID_QUAD_TDM_IBIT,
++				    attr, 0, exp_tdm_rate,
++				    SNDRV_PCM_STREAM_PLAYBACK);
++	dev_info(rtd->dev, "exp: QUAD_TDM_IBIT vote attr=%d rate=%d ret=%d\n",
++		 attr, exp_tdm_rate, ret);
++	/* keep the DAI's refcount; port stays open for the stream */
++}
++
++static void sm8250_exp_tdm_cleanup(struct device *dev)
++{
++	if (exp_core_voted) {
++		q6afe_unvote_lpass_core_hw(dev, Q6AFE_LPASS_CORE_HW_MACRO_BLOCK,
++					   exp_core_handles[0]);
++		q6afe_unvote_lpass_core_hw(dev, Q6AFE_LPASS_CORE_HW_DCODEC_BLOCK,
++					   exp_core_handles[1]);
++		exp_core_voted = false;
++	}
++}
++
+ struct sm8250_snd_data {
+ 	bool stream_prepared[AFE_PORT_MAX];
+ 	struct snd_soc_card *card;
+@@ -144,6 +190,23 @@
+ 		snd_soc_dai_set_fmt(cpu_dai, fmt);
+ 		snd_soc_dai_set_fmt(codec_dai, codec_dai_fmt);
+ 		break;
++	case QUATERNARY_MI2S_RX:
++		codec_dai_fmt |= SND_SOC_DAIFMT_NB_NF | SND_SOC_DAIFMT_I2S;
++		snd_soc_dai_set_sysclk(cpu_dai,
++			Q6AFE_LPASS_CLK_ID_QUAD_MI2S_IBIT,
++			MI2S_BCLK_RATE, SNDRV_PCM_STREAM_PLAYBACK);
++		snd_soc_dai_set_fmt(cpu_dai, fmt);
++		for_each_rtd_codec_dais(rtd, j, codec_dai) {
++			ret = snd_soc_dai_set_fmt(codec_dai, codec_dai_fmt);
++			if (ret < 0) {
++				dev_err(rtd->dev, "MI2S fmt err:%d\n", ret);
++				return ret;
++			}
++			snd_soc_dai_set_sysclk(codec_dai, 0, MI2S_BCLK_RATE,
++					       SNDRV_PCM_STREAM_PLAYBACK);
++		}
++		sm8250_exp_tdm_vote(rtd, cpu_dai);
++		break;
+ 	case TERTIARY_TDM_RX_0:
+ 	case QUATERNARY_TDM_RX_0:
+ 		codec_dai_fmt |= SND_SOC_DAIFMT_NB_NF | SND_SOC_DAIFMT_DSP_A;
+@@ -151,11 +214,16 @@
+ 			cpu_dai->id == QUATERNARY_TDM_RX_0 ?
+ 				Q6AFE_LPASS_CLK_ID_QUAD_TDM_IBIT :
+ 				Q6AFE_LPASS_CLK_ID_TER_TDM_IBIT,
+-			TDM_BCLK_RATE, SNDRV_PCM_STREAM_PLAYBACK);
++			cpu_dai->id == QUATERNARY_TDM_RX_0 ?
++				exp_tdm_rate : TDM_BCLK_RATE,
++			SNDRV_PCM_STREAM_PLAYBACK);
+ 
+ 		for_each_rtd_codec_dais(rtd, j, codec_dai) {
+ 			ret = snd_soc_dai_set_fmt(codec_dai, codec_dai_fmt);
+-			snd_soc_dai_set_sysclk(codec_dai, 0, TDM_BCLK_RATE, SNDRV_PCM_STREAM_PLAYBACK);
++			snd_soc_dai_set_sysclk(codec_dai, 0,
++					cpu_dai->id == QUATERNARY_TDM_RX_0 ?
++						exp_tdm_rate : TDM_BCLK_RATE,
++					SNDRV_PCM_STREAM_PLAYBACK);
+ 			if (ret < 0) {
+ 				dev_err(rtd->dev, "TDM fmt err:%d\n", ret);
+ 				return ret;
+@@ -169,6 +237,8 @@
+ 				return ret;
+ 			}
+ 		}
++		if (cpu_dai->id == QUATERNARY_TDM_RX_0)
++			sm8250_exp_tdm_vote(rtd, cpu_dai);
+ 		break;
+ 	default:
+ 		break;
+@@ -186,6 +256,9 @@
+ 
+ 	data->sruntime[cpu_dai->id] = NULL;
+ 	sdw_release_stream(sruntime);
++
++	if (cpu_dai->id == QUATERNARY_TDM_RX_0)
++		sm8250_exp_tdm_cleanup(cpu_dai->dev);
+ }
+ 
+ static int sm8250_snd_hw_params(struct snd_pcm_substream *substream,

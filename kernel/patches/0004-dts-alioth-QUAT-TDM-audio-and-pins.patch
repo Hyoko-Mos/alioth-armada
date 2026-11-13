@@ -1,0 +1,95 @@
+--- /root/armada/linux-upstream/arch/arm64/boot/dts/qcom/sm8250-xiaomi-alioth.dts	2026-11-13 16:11:27.166790523 +0800
++++ /root/armada/linux-alioth/arch/arm64/boot/dts/qcom/sm8250-xiaomi-alioth.dts	2026-11-13 20:02:11.707847369 +0800
+@@ -758,6 +758,7 @@
+ 	cs35l41_lcv: speaker-amp@41 {
+ 		compatible = "cirrus,cs35l41";
+ 		reg = <0x41>;
++		cirrus,right-channel-amp;
+ 		VA-supply = <&vreg_s4a_1p8>;
+ 		VP-supply = <&vph_pwr>;
+ 		interrupt-parent = <&tlmm>;
+@@ -1066,6 +1067,22 @@
+ 		qcom,tdm-data-delay = <1>;
+ 		qcom,tdm-data-align = <0>;
+ 	};
++
++	/*
++	 * The speaker path uses the quaternary TDM block on the LPI qua_mi2s
++	 * pins. Parameters mirror the vendor DTBO (fragment@66/96):
++	 * port 0x9030, BCLK 1536000, sync-mode 1 (long), sync-src 1 (internal),
++	 * invert-sync 1, data-delay 1.
++	 */
++	dai@72 {
++		reg = <QUATERNARY_TDM_RX_0>;
++		qcom,tdm-sync-mode = <1>;
++		qcom,tdm-sync-src = <1>;
++		qcom,tdm-data-out = <0>;
++		qcom,tdm-invert-sync = <1>;
++		qcom,tdm-data-delay = <1>;
++		qcom,tdm-data-align = <0>;
++	};
+ };
+ 
+ &q6asmdai {
+@@ -1079,14 +1096,46 @@
+ };
+ 
+ &lpass_tlmm {
+-	status = "disabled";
++	status = "okay";
++
++	/*
++	 * The speaker amps hang off the *quaternary* MI2S block on the LPASS LPI
++	 * pins, not the tertiary block on the main TLMM. The vendor DTBO for this
++	 * board (dtbo_a, fragment@96) muxes gpio0/1/2 with function "func2",
++	 * which is qua_mi2s_sclk / qua_mi2s_ws / qua_mi2s_data here.
++	 */
++	quat_tdm_active: quat-tdm-active-state {
++		sck-pins {
++			pins = "gpio0";
++			function = "qua_mi2s_sclk";
++			drive-strength = <8>;
++			bias-disable;
++			output-high;
++		};
++
++		ws-pins {
++			pins = "gpio1";
++			function = "qua_mi2s_ws";
++			drive-strength = <8>;
++			bias-disable;
++			output-high;
++		};
++
++		data-pins {
++			pins = "gpio2";
++			function = "qua_mi2s_data";
++			drive-strength = <8>;
++			bias-disable;
++			output-high;
++		};
++	};
+ };
+ 
+ &sound {
+ 	compatible = "qcom,sm8250-sndcard";
+ 	model = "xiaomi-alioth";
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&tert_tdm_active>;
++	pinctrl-0 = <&quat_tdm_active>;
+ 
+ 	mm1-dai-link {
+ 		link-name = "MultiMedia1";
+@@ -1097,10 +1146,10 @@
+ 	};
+ 
+ 	speaker-dai-link {
+-		link-name = "Tertiary TDM Playback";
++		link-name = "Quaternary TDM Playback";
+ 
+ 		cpu {
+-			sound-dai = <&q6afedai TERTIARY_TDM_RX_0>;
++			sound-dai = <&q6afedai QUATERNARY_TDM_RX_0>;
+ 		};
+ 
+ 		platform {

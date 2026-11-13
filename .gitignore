@@ -1,0 +1,13 @@
+# firmware blobs never go in here
+*.mbn
+*.wmfw
+*.bin
+*.acdb
+*.qwsp
+*.img
+
+# build artifacts
+*.ko
+*.o
+*.tar.zst
+out/

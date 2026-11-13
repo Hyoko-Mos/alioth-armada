@@ -1,0 +1,45 @@
+--- sound/soc/qcom/qdsp6/q6core.c	2026-11-13 18:18:33.972392995 +0800
++++ sound/soc/qcom/qdsp6/q6core.c	2026-11-13 18:18:33.990843211 +0800
+@@ -63,6 +63,7 @@
+ 	bool get_state_supported;
+ 	bool get_version_supported;
+ 	bool is_version_requested;
++	bool get_state_checked;
+ };
+ 
+ static struct q6core *g_core;
+@@ -91,6 +92,8 @@
+ 		case AVCS_CMD_ADSP_EVENT_GET_STATE:
+ 			if (result->status == ADSP_EUNSUPPORTED)
+ 				core->get_state_supported = false;
++			else if (result->status > ADSP_EOK)
++				core->avcs_state = 0;
+ 			core->resp_received = true;
+ 			break;
+ 		}
+@@ -225,12 +228,22 @@
+ 	if (rc > 0 && core->resp_received) {
+ 		core->resp_received = false;
+ 
+-		if (core->avcs_state)
++		if (core->avcs_state) {
++			core->get_state_checked = true;
+ 			return true;
++		}
+ 	}
++	if (!core->resp_received)
++		core->get_state_checked = false;
+ 
+-	/* assume that the adsp is up if we not support this command */
+-	if (!core->get_state_supported)
++	/*
++	 * Only assume that the adsp is up if the GET_STATE command is genuinely
++	 * unsupported (older firmware): in that case get_state_supported was
++	 * cleared by the callback above. Any other failed response leaves
++	 * get_state_supported at its initial false, so also require a valid
++	 * avcs_state before treating the DSP as up (Nova-Deck issue #94 race).
++	 */
++	if (!core->get_state_supported && core->get_state_checked)
+ 		return true;
+ 
+ 	return false;
