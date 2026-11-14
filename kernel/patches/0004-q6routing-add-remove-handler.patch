@@ -1,0 +1,10 @@
+--- a/sound/soc/qcom/qdsp6/q6routing.c	2026-11-14 17:39:05.118415306 +0800
++++ b/sound/soc/qcom/qdsp6/q6routing.c	2026-11-14 17:39:05.118514140 +0800
+@@ -1143,6 +1143,7 @@
+ 
+ static void q6pcm_routing_remove(struct platform_device *pdev)
+ {
++	snd_soc_unregister_component(&pdev->dev);
+ 	kfree(routing_data);
+ 	routing_data = NULL;
+ }

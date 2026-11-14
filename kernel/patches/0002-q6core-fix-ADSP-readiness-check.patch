@@ -1,5 +1,5 @@
---- sound/soc/qcom/qdsp6/q6core.c	2026-11-13 18:18:33.972392995 +0800
-+++ sound/soc/qcom/qdsp6/q6core.c	2026-11-13 18:18:33.990843211 +0800
+--- a/sound/soc/qcom/qdsp6/q6core.c	2026-11-14 17:39:05.112727775 +0800
++++ b/sound/soc/qcom/qdsp6/q6core.c	2026-11-14 17:39:05.112830665 +0800
 @@ -63,6 +63,7 @@
  	bool get_state_supported;
  	bool get_version_supported;

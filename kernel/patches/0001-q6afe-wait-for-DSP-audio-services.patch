@@ -1,5 +1,5 @@
---- sound/soc/qcom/qdsp6/q6afe.c	2026-11-13 18:18:33.975568019 +0800
-+++ sound/soc/qcom/qdsp6/q6afe.c	2026-11-13 18:39:51.102489660 +0800
+--- a/sound/soc/qcom/qdsp6/q6afe.c	2026-11-14 17:39:05.110585918 +0800
++++ b/sound/soc/qcom/qdsp6/q6afe.c	2026-11-14 17:39:05.110763945 +0800
 @@ -1733,6 +1733,7 @@
  {
  	struct q6afe *afe;

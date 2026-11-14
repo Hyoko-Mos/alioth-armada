@@ -1,0 +1,120 @@
+--- a/sound/soc/qcom/sm8250.c	2026-11-14 17:39:05.125318581 +0800
++++ b/sound/soc/qcom/sm8250.c	2026-11-14 17:39:05.125840694 +0800
+@@ -5,6 +5,7 @@
+ #include <linux/module.h>
+ #include <linux/platform_device.h>
+ #include <sound/soc.h>
++#include <sound/cs35l41.h>
+ #include <sound/soc-dapm.h>
+ #include <sound/pcm.h>
+ #include <sound/pcm_params.h>
+@@ -143,11 +144,60 @@
+ 			MI2S_BCLK_RATE, SNDRV_PCM_STREAM_PLAYBACK);
+ 		snd_soc_dai_set_fmt(cpu_dai, fmt);
+ 		snd_soc_dai_set_fmt(codec_dai, codec_dai_fmt);
++		/* The amp protection firmware programs its PLL for a 12.288 MHz
++		 * reference by default; the ADSP drives TER_MI2S_IBIT at
++		 * MI2S_BCLK_RATE (1.536 MHz). Without this the amps see an 8x
++		 * mismatched clock and stay silent while every DAPM widget and
++		 * power register reads healthy. */
++		for_each_rtd_codec_dais(rtd, j, codec_dai) {
++			ret = snd_soc_component_set_sysclk(codec_dai->component,
++							   CS35L41_CLKID_SCLK, 0,
++							   MI2S_BCLK_RATE,
++							   SNDRV_PCM_STREAM_PLAYBACK);
++			if (ret < 0) {
++				dev_err(rtd->dev, "codec PLL clk err:%d\n", ret);
++				return ret;
++			}
++		}
++		/* I2S stereo: RCV takes left (slot 0), LCV right (slot 1).
++		 * Without an explicit map both amps keep the hw default
++		 * (slot 1) and the left channel never reaches RCV. */
++		{
++			static const unsigned int i2s_rx_slots[2][1] = { {0}, {1} };
++			for_each_rtd_codec_dais(rtd, j, codec_dai) {
++				ret = snd_soc_dai_set_channel_map(codec_dai, 0, NULL,
++								  1, i2s_rx_slots[j]);
++				if (ret < 0) {
++					dev_err(rtd->dev, "I2S slot map err:%d\n", ret);
++					return ret;
++				}
++			}
++		}
++		break;
++	case TERTIARY_MI2S_TX:
++		codec_dai_fmt |= SND_SOC_DAIFMT_NB_NF | SND_SOC_DAIFMT_I2S;
++		snd_soc_dai_set_sysclk(cpu_dai,
++			Q6AFE_LPASS_CLK_ID_TER_MI2S_IBIT,
++			MI2S_BCLK_RATE, SNDRV_PCM_STREAM_CAPTURE);
++		snd_soc_dai_set_fmt(cpu_dai, fmt);
++		for_each_rtd_codec_dais(rtd, j, codec_dai) {
++			unsigned int tx_slot = j;
++			snd_soc_dai_set_fmt(codec_dai, codec_dai_fmt);
++			snd_soc_component_set_sysclk(codec_dai->component,
++						     CS35L41_CLKID_SCLK, 0,
++						     MI2S_BCLK_RATE,
++						     SNDRV_PCM_STREAM_CAPTURE);
++			/* amp ASP TX1 -> CPU capture slot j */
++			snd_soc_dai_set_channel_map(codec_dai, 1, &tx_slot, 0, NULL);
++		}
+ 		break;
+ 	case TERTIARY_TDM_RX_0:
++	case QUATERNARY_TDM_RX_0:
+ 		codec_dai_fmt |= SND_SOC_DAIFMT_NB_NF | SND_SOC_DAIFMT_DSP_A;
+ 		snd_soc_dai_set_sysclk(cpu_dai,
+-			Q6AFE_LPASS_CLK_ID_TER_TDM_IBIT,
++			cpu_dai->id == QUATERNARY_TDM_RX_0 ?
++				Q6AFE_LPASS_CLK_ID_QUAD_TDM_IBIT :
++				Q6AFE_LPASS_CLK_ID_TER_TDM_IBIT,
+ 			TDM_BCLK_RATE, SNDRV_PCM_STREAM_PLAYBACK);
+ 
+ 		for_each_rtd_codec_dais(rtd, j, codec_dai) {
+@@ -230,6 +280,38 @@
+ 	.prepare = sm8250_snd_prepare,
+ };
+ 
++/*
++ * The TERT MI2S speaker backend is fixed at 48 kHz / 16-bit / stereo I2S.
++ * The q6asm frontend advertises up to 8 channels, so PipeWire picks an
++ * 8-channel s24-32le sink, which then never matches the hardware path and
++ * also makes hardware volume control meaningless. Pin the frontend to the
++ * real stream format instead of advertising capability the backend lacks.
++ */
++static int sm8250_fe_startup(struct snd_pcm_substream *substream)
++{
++	struct snd_pcm_runtime *rtd_runtime = substream->runtime;
++	int ret;
++
++	if (substream->stream != SNDRV_PCM_STREAM_PLAYBACK)
++		return 0;
++
++	ret = snd_pcm_hw_constraint_minmax(rtd_runtime,
++					   SNDRV_PCM_HW_PARAM_CHANNELS, 2, 2);
++	if (ret < 0)
++		return ret;
++	ret = snd_pcm_hw_constraint_minmax(rtd_runtime,
++					   SNDRV_PCM_HW_PARAM_RATE, 48000, 48000);
++	if (ret < 0)
++		return ret;
++	return snd_pcm_hw_constraint_mask64(rtd_runtime,
++					    SNDRV_PCM_HW_PARAM_FORMAT,
++					    SNDRV_PCM_FMTBIT_S16_LE);
++}
++
++static const struct snd_soc_ops sm8250_fe_ops = {
++	.startup = sm8250_fe_startup,
++};
++
+ static void sm8250_add_be_ops(struct snd_soc_card *card)
+ {
+ 	struct snd_soc_dai_link *link;
+@@ -240,6 +322,8 @@
+ 			link->init = sm8250_snd_init;
+ 			link->be_hw_params_fixup = sm8250_be_hw_params_fixup;
+ 			link->ops = &sm8250_be_ops;
++		} else if (link->dynamic == 1) {
++			link->ops = &sm8250_fe_ops;
+ 		}
+ 	}
+ }

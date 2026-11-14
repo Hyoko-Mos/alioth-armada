@@ -1,0 +1,21 @@
+--- a/sound/soc/qcom/qdsp6/q6asm-dai.c	2026-11-14 17:39:05.115981294 +0800
++++ b/sound/soc/qcom/qdsp6/q6asm-dai.c	2026-11-14 17:39:05.116085887 +0800
+@@ -1315,12 +1315,18 @@
+ MODULE_DEVICE_TABLE(of, q6asm_dai_device_id);
+ #endif
+ 
++static void q6asm_dai_remove(struct platform_device *pdev)
++{
++	snd_soc_unregister_component(&pdev->dev);
++}
++
+ static struct platform_driver q6asm_dai_platform_driver = {
+ 	.driver = {
+ 		.name = "q6asm-dai",
+ 		.of_match_table = of_match_ptr(q6asm_dai_device_id),
+ 	},
+ 	.probe = q6asm_dai_probe,
++	.remove = q6asm_dai_remove,
+ };
+ module_platform_driver(q6asm_dai_platform_driver);
+ 

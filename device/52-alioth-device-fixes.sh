@@ -6,12 +6,12 @@
 #          on spi4.0) — a real input device, no userspace THP daemon. The
 #          panel has an intermittent hardware fault; a mask helper is shipped
 #          (alioth-touch-mask) but NOT auto-enabled.
-#   audio  the alioth sound card is named "xiaomi-alioth" and uses a QUATERNARY
-#          TDM speaker link (QUAT_TDM_RX_0 + LPASS LPI pinctrl 0x33c0000, NOT
-#          thyme's "XIAOMI-UMI-..." MI2S card), so the thyme UCM2 does not
-#          match. alioth UCM2 is staged separately under
-#          system_files/usr/share/alsa/ucm2 (Phase 4); audio is not boot-
-#          critical.
+#   audio  the alioth sound card is named "xiaomi-alioth" and drives the two
+#          CS35L41 amps over TERTIARY MI2S (TERT_MI2S_RX, main TLMM mi2s2 pins
+#          gpio133/135/137, 48 kHz 16-bit stereo, TER_MI2S_IBIT 1.536 MHz). Not
+#          thyme's "XIAOMI-UMI-..." card, so the thyme UCM2 does not match;
+#          alioth UCM2 is staged under system_files/usr/share/alsa/ucm2.
+#          audio is still not boot-critical (the route service is best-effort).
 #   usb    pure NCM gadget (10.42.0.1/24 + fe80::1/64). RNDIS was dropped: this
 #          host's RNDIS driver fails to start (Code 10) and one failing function
 #          makes Windows reject the whole composite device. The gadget below is
@@ -330,88 +330,130 @@ ADSPUNIT
 systemctl enable armada-adsp-start.service
 
 # ---------------------------------------------------------------------------
-# 7. LPASS LPI pinctrl reprobe + speaker route
+# 7. Speaker route (TERTIARY MI2S, main TLMM)
 #
-# With the QUATERNARY_TDM speaker path the sound card depends on the LPI
-# pinctrl at 33c0000. That driver needs LPASS clocks which only exist after the
-# ADSP remoteproc is running; it probes at ~10s (rootfs not mounted yet) and
-# fails with -ETIMEDOUT/-110, leaving "sound" stuck in deferred probe forever.
-# Rebinding it after armada-adsp-start.service registers the card reliably.
-# The service also opens the FE->QUAT_TDM_RX_0 mixer route and raises the
-# cs35l41 volumes, which otherwise reset on every boot.
+# The speakers hang off TERT_MI2S_RX on the main TLMM mi2s2 pins
+# (gpio133 sck / gpio135 ws / gpio137 data1, pinctrl is applied by the sound
+# node itself). The LPASS LPI pinctrl path used by the earlier QUATERNARY TDM
+# recipe is now disabled in the device tree, so the reprobe dance it needed is
+# gone. What still has to happen once per boot is opening the MultiMedia1 ->
+# TERT_MI2S_RX mixer route and the cs35l41 DSP/volume controls; the UCM2
+# profile in system_files/usr/share/alsa/ucm2 does not run outside a session.
+#
+# Note: cs35l41 PLL retargeting to the real 1.536 MHz BCLK is done by
+# sm8250.c at stream start (the protection firmware defaults to 12.288 MHz).
+# Do not try to fix it from userspace.
 # ---------------------------------------------------------------------------
-cat > /usr/libexec/armada-lpi-reprobe <<'REPROBE'
+cat > /usr/libexec/armada-speaker-route <<'SPKROUTE'
 #!/bin/bash
 set -u
-D=/sys/bus/platform/drivers/qcom-sm8250-lpass-lpi-pinctrl
-DEV=33c0000.pinctrl
-LNK=/sys/bus/platform/devices/$DEV/driver
-
-for i in $(seq 1 40); do
-    ok=0
-    for r in /sys/class/remoteproc/*; do
-        [ -r "$r/name" ] || continue
-        if [ "$(cat "$r/name")" = "adsp" ] && [ "$(cat "$r/state")" = "running" ]; then
-            ok=1
-            break
-        fi
-    done
-    [ "$ok" -eq 1 ] && break
-    sleep 1
-done
-
-# Always force a reprobe. A stale driver link can exist briefly during the
-# failing early probe, so an -e check here produces false positives.
-for i in $(seq 1 5); do
-    echo "$DEV" > "$D/unbind" 2>/dev/null || true
-    sleep 1
-    echo "$DEV" > "$D/bind" 2>/dev/null || true
-    sleep 2
-    if readlink -f "$LNK" 2>/dev/null | grep -qi "lpass-lpi"; then
-        echo "lpi pinctrl bound (attempt $i)"
-        break
-    fi
-done
-
 for i in $(seq 1 20); do
     [ -e /dev/snd/controlC0 ] && break
     sleep 1
 done
-if [ -e /dev/snd/controlC0 ]; then
-    amixer -c 0 cset "name=QUAT_TDM_RX_0 Audio Mixer MultiMedia1" 1 >/dev/null 2>&1 || true
-    for n in "LCV Analog PCM Volume" "RCV Analog PCM Volume"; do
-        amixer -c 0 cset "name=$n" 20 >/dev/null 2>&1 || true
-    done
-    # Load speaker-protection DSP firmware, disable the HW noise gate.
-    for n in "LCV DSP1 Preload Switch" "RCV DSP1 Preload Switch"; do
-        amixer -c 0 cset "name=$n" 1 >/dev/null 2>&1 || true
-    done
-    for n in "LCV HW Noise Gate Enable" "RCV HW Noise Gate Enable"; do
-        amixer -c 0 cset "name=$n" 0 >/dev/null 2>&1 || true
-    done
-    echo "speaker route opened"
-else
+if [ ! -e /dev/snd/controlC0 ]; then
     echo "sound card did not appear" >&2
     exit 1
 fi
-REPROBE
-chmod 0755 /usr/libexec/armada-lpi-reprobe
+# Frontend -> backend route.
+amixer -c 0 cset "name=TERT_MI2S_RX Audio Mixer MultiMedia1" 1 >/dev/null 2>&1 || true
+# Protection DSP + DAC source.
+for n in "LCV DSP1 Preload Switch" "RCV DSP1 Preload Switch"; do
+    amixer -c 0 cset "name=$n" 1 >/dev/null 2>&1 || true
+done
+for n in "LCV DSP RX1 Source" "RCV DSP RX1 Source"; do
+    amixer -c 0 cset "name=$n" ASPRX1 >/dev/null 2>&1 || true
+done
+for n in "LCV PCM Source" "RCV PCM Source"; do
+    amixer -c 0 cset "name=$n" DSP >/dev/null 2>&1 || true
+done
+# 0 dB digital (SOC_SINGLE_SX_TLV: 816 -> code 2047; 913 wraps to mute) and
+# maximum analog gain. PipeWire applies the user-facing level on top.
+for n in "LCV Digital PCM Volume" "RCV Digital PCM Volume"; do
+    amixer -c 0 cset "name=$n" 816 >/dev/null 2>&1 || true
+done
+for n in "LCV Analog PCM Volume" "RCV Analog PCM Volume"; do
+    amixer -c 0 cset "name=$n" 20 >/dev/null 2>&1 || true
+done
+# Hardware noise gate fights quiet material; the firmware protection DSP is
+# what should be limiting, not the fixed gate.
+for n in "LCV HW Noise Gate Enable" "RCV HW Noise Gate Enable"; do
+    amixer -c 0 cset "name=$n" 0 >/dev/null 2>&1 || true
+done
+echo "speaker route opened"
+SPKROUTE
+chmod 0755 /usr/libexec/armada-speaker-route
 
-cat > /usr/lib/systemd/system/armada-lpi-reprobe.service <<'REPROBEUNIT'
+cat > /usr/lib/systemd/system/armada-speaker-route.service <<'SPKROUTEUNIT'
 [Unit]
-Description=Reprobe LPASS LPI pinctrl after ADSP is running
-After=armada-adsp-start.service
+Description=Open the alioth TERT MI2S speaker route
+After=armada-adsp-start.service sound.target
 Wants=armada-adsp-start.service
-Before=sound.target
+Before=wireplumber.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/libexec/armada-lpi-reprobe
+ExecStart=/usr/libexec/armada-speaker-route
 
 [Install]
 WantedBy=multi-user.target
-REPROBEUNIT
-systemctl enable armada-lpi-reprobe.service
+SPKROUTEUNIT
+systemctl enable armada-speaker-route.service
+
+# ---------------------------------------------------------------------------
+# 8. UCM2 profile
+#
+# The upstream sm8250 UCM still describes the QUATERNARY TDM card, which this
+# device tree no longer uses. Ship the TERT MI2S profile so an ACP-based
+# consumer picks the right mixer names instead of failing on stale ones.
+# ---------------------------------------------------------------------------
+UCMDIR=/usr/share/alsa/ucm2/Qualcomm/sm8250
+mkdir -p "$UCMDIR"
+cat > "$UCMDIR/Xiaomi-Alioth-HiFi.conf" <<'UCMHIFI'
+# HiFi verb for Xiaomi alioth speakers.
+#   MultiMedia1 -> TERT_MI2S_RX -> cs35l41 RCV/LCV (hw:${CardId},0)
+# The amp protection firmware defaults its PLL to a 12.288 MHz reference; the
+# ADSP drives TER_MI2S_IBIT at 1.536 MHz, so sm8250.c retargets the PLL at
+# stream start. Do not add a PLL cset here.
+SectionVerb {
+	EnableSequence [
+		cset "name='TERT_MI2S_RX Audio Mixer MultiMedia1' 1"
+		cset "name='RCV DSP1 Preload Switch' 1"
+		cset "name='LCV DSP1 Preload Switch' 1"
+		cset "name='RCV DSP RX1 Source' 'ASPRX1'"
+		cset "name='LCV DSP RX1 Source' 'ASPRX1'"
+		cset "name='RCV PCM Source' DSP"
+		cset "name='LCV PCM Source' DSP"
+	]
+
+	DisableSequence [
+		cset "name='TERT_MI2S_RX Audio Mixer MultiMedia1' 0"
+	]
+
+	Value {
+		TQ "HiFi"
+	}
+}
+
+SectionDevice."Speaker" {
+	Comment "Speaker Playback"
+
+	EnableSequence [
+		# SOC_SINGLE_SX_TLV: ctl = register code - 1231 (11-bit field).
+		# 816 -> code 2047 (0 dB). 913 wraps to code 96 (mute).
+		cset "name='RCV Digital PCM Volume' 816"
+		cset "name='LCV Digital PCM Volume' 816"
+		cset "name='RCV Analog PCM Volume' 20"
+		cset "name='LCV Analog PCM Volume' 20"
+	]
+
+	Value {
+		PlaybackPriority 100
+		PlaybackPCM "hw:${CardId},0"
+		PlaybackChannels 2
+	}
+}
+UCMHIFI
 
 echo "==> alioth device fixes done"

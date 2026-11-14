@@ -1,20 +1,15 @@
-The Linux Kernel is provided under:
+GNU General Public License v2.0 or later (GPL-2.0-or-later)
 
-	SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note
+This project is licensed under the GNU General Public License, version 2 or
+later (SPDX: GPL-2.0-or-later), matching the kernel code it patches and the
+Armada OS distribution it targets.
 
-Being under the terms of the GNU General Public License version 2 only,
-according with:
+The patches in kernel/patches/ modify Linux kernel sources, and therefore carry
+the kernel's own licensing, including its syscall exception
+(SPDX: GPL-2.0 WITH Linux-syscall-note) where applicable.
 
-	LICENSES/preferred/GPL-2.0
+The full text of the GPL version 2.0 is available at:
 
-With an explicit syscall exception, as stated at:
+    https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 
-	LICENSES/exceptions/Linux-syscall-note
-
-In addition, other licenses may also apply. Please see:
-
-	Documentation/process/license-rules.rst
-
-for more details.
-
-All contributions to the Linux Kernel are subject to this COPYING file.
+Copyright (C) 2026 the alioth-armada contributors.

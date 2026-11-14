@@ -1,0 +1,119 @@
+--- a/arch/arm64/boot/dts/qcom/sm8250-xiaomi-alioth.dts	2026-11-14 17:39:05.134525765 +0800
++++ b/arch/arm64/boot/dts/qcom/sm8250-xiaomi-alioth.dts	2026-11-14 17:39:05.135248741 +0800
+@@ -758,6 +758,7 @@
+ 	cs35l41_lcv: speaker-amp@41 {
+ 		compatible = "cirrus,cs35l41";
+ 		reg = <0x41>;
++		cirrus,right-channel-amp;
+ 		VA-supply = <&vreg_s4a_1p8>;
+ 		VP-supply = <&vph_pwr>;
+ 		interrupt-parent = <&tlmm>;
+@@ -1057,14 +1058,20 @@
+ };
+ 
+ &q6afedai {
+-	dai@56 {
+-		reg = <TERTIARY_TDM_RX_0>;
+-		qcom,tdm-sync-mode = <0>;
+-		qcom,tdm-sync-src = <1>;
+-		qcom,tdm-data-out = <0>;
+-		qcom,tdm-invert-sync = <1>;
+-		qcom,tdm-data-delay = <1>;
+-		qcom,tdm-data-align = <0>;
++	/*
++	 * hakios (xiongnemo/hakios-alioth) verified recipe: the alioth speakers
++	 * run on the TERTIARY MI2S port 0x1004, SD1, 16-bit stereo, with
++	 * TER_MI2S_IBIT at 1.536 MHz (COUPLE_NO) -- the ADSP drives the mi2s2
++	 * pins (main TLMM gpio133/135/137) from that port.
++	 */
++	dai@20 {
++		reg = <TERTIARY_MI2S_RX>;
++		qcom,sd-lines = <1>;
++	};
++
++	dai@21 {
++		reg = <TERTIARY_MI2S_TX>;
++		qcom,sd-lines = <0>;
+ 	};
+ };
+ 
+@@ -1079,14 +1086,49 @@
+ };
+ 
+ &lpass_tlmm {
++	/* not used for the speaker path: the ADSP drives main-TLMM mi2s2 pins */
+ 	status = "disabled";
+ };
+ 
++&tlmm {
++	tert_mi2s_active: tert-mi2s-active-state {
++		sck-pins {
++			pins = "gpio133";
++			function = "mi2s2_sck";
++			drive-strength = <8>;
++			bias-disable;
++			output-high;
++		};
++
++		ws-pins {
++			pins = "gpio135";
++			function = "mi2s2_ws";
++			drive-strength = <8>;
++			bias-disable;
++			output-high;
++		};
++
++		data-pins {
++			pins = "gpio137";
++			function = "mi2s2_data1";
++			drive-strength = <8>;
++			bias-disable;
++		};
++
++		data0-pins {
++			pins = "gpio134";
++			function = "mi2s2_data0";
++			drive-strength = <8>;
++			bias-disable;
++		};
++	};
++};
++
+ &sound {
+ 	compatible = "qcom,sm8250-sndcard";
+ 	model = "xiaomi-alioth";
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&tert_tdm_active>;
++	pinctrl-0 = <&tert_mi2s_active>;
+ 
+ 	mm1-dai-link {
+ 		link-name = "MultiMedia1";
+@@ -1097,10 +1139,26 @@
+ 	};
+ 
+ 	speaker-dai-link {
+-		link-name = "Tertiary TDM Playback";
++		link-name = "Tertiary MI2S Playback";
++
++		cpu {
++			sound-dai = <&q6afedai TERTIARY_MI2S_RX>;
++		};
++
++		platform {
++			sound-dai = <&q6routing>;
++		};
++
++		codec {
++			sound-dai = <&cs35l41_rcv 0>, <&cs35l41_lcv 0>;
++		};
++	};
++
++	speaker-capture-dai-link {
++		link-name = "Tertiary MI2S Capture";
+ 
+ 		cpu {
+-			sound-dai = <&q6afedai TERTIARY_TDM_RX_0>;
++			sound-dai = <&q6afedai TERTIARY_MI2S_TX>;
+ 		};
+ 
+ 		platform {

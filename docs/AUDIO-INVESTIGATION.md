@@ -1,136 +1,145 @@
-# The alioth speaker investigation — four rounds, one flat pad
+# The alioth speaker investigation — seven rounds, one PLL
 
-This documents a complete, evidence-driven investigation into why the
-speakers (2× Cirrus Logic CS35L41, i2c 3-0040/3-0041) stay silent on
-mainline Linux (6.15.1) on the Xiaomi alioth (Redmi K40 / POCO F3,
-SM8250), with everything else on the audio stack working.
+How two Cirrus Logic CS35L41 amplifiers (i2c 3-0040 / 3-0041) on the Xiaomi
+alioth (Redmi K40 / POCO F3, SM8250) went from "the entire software chain looks
+healthy but nothing comes out" to **audible speakers with working volume control
+that survive a reboot**.
 
-**TL;DR** — the software chain is fully functional end-to-end, the ADSP
-accepts every command, but the LPASS QUAT TDM/MI2S output block never
-produces a physical BCLK. We believe the missing piece is ACDB
-calibration data that Android's vendor audio HAL normally uploads to the
-DSP, for which mainline has no userspace. **Help wanted.**
+If you read only one paragraph: the amp protection firmware defaults its PLL
+reference to **12.288 MHz**, the ADSP drives `TER_MI2S_IBIT` at **1.536 MHz**,
+and that 8× mismatch silences the output stage while leaving every readable
+register looking perfect.
 
-## Hardware facts (decoded from the vendor DTBO)
+---
 
-The vendor DTBO (decoded in `dtbo-tdm.txt`, `dtbo-amps.txt` via
-`scripts/dtbo_dump.py`) says:
+## Hardware (decoded from the vendor DTBO)
 
-- Speaker path: **QUAT TDM** group 0x9130, port **0x9030**
-  (`QUATERNARY_TDM_RX_0`), `clk-rate = 0x177000` (**1536000 Hz**),
-  `clk-internal = 1`, `sync-mode = 1` (long sync), `sync-src = 1`
-  (internal), `invert-sync = 1`, `data-delay = 1`.
-- Pins: **LPASS LPI gpio0/1/2, function 2** — named `qua_mi2s_sck/ws/data`
-  in mainline's LPI pinctrl driver. drive-strength 8, active state
-  output-high. (Yes: the TDM block uses the "mi2s" pin group — on SM8250
-  the QUAT MI2S and QUAT TDM share the LPI pins.)
-- Amps: cs35l41 at i2c bus 3, addresses 0x40 (RCV, speaker-name-prefix
-  "RCV") and 0x41 (LCV, `right-channel-amp`). Boost params: 4000 mA /
-  1000 nH / 15 µF — identical in our DTS.
+`scripts/dtbo_dump.py` → `docs/dtbo-tdm.txt`, `docs/dtbo-amps.txt`.
 
-## What works (verified on-device)
+- **Amps**: CS35L41 on i2c bus 3, `0x40` (RCV, `sound-name-prefix "RCV"`) and
+  `0x41` (LCV, `cirrus,right-channel-amp`). Shared reset on gpio114, IRQs on
+  gpio113 / gpio112. Boost 4000 mA / 1000 nH / 15 µF, `boost-type = 0`
+  (INT_BOOST).
+- **Vendor DTBO port**: `QUAT TDM` group 0x9130 / port 0x9030 at
+  `clk-rate 0x177000` (1 536 000 Hz). That is *not* the port that actually
+  works here — see "the port we ended up on".
+- **Pins (working path)**: main TLMM `mi2s2` — gpio133 (sck), gpio135 (ws),
+  gpio137 (data1, mux 3). `gpio134` is `mi2s2_data0` and is an **ADSP output**
+  (OE=1); it is not a usable CPU capture input.
 
-1. **Sound card registers on every boot** after our q6afe/q6core race
-   patches (0001/0002). Before them, a fresh boot had *no sound card*:
-   `q6afe` probed before the ADSP audio services were up, its LPASS core
-   HW vote (`opcode 0x100f4`) was rejected with status `0x16`, the LPI
-   pinctrl driver (`33c0000.pinctrl`) never got its `core`/`audio`
-   clocks, and `sound` stayed deferred forever. Signature identical to
-   [Nova-Deck/os-build#94](https://github.com/Nova-Deck/os-build/issues/94).
-2. **PipeWire → UCM → ALSA → DAPM → codec**: we ship a UCM2 profile
-   (`device/ucm/`) for the `xiaomi-alioth` card; with WirePlumber's
-   forced-ACP default flipped off, `paplay` reaches a RUNNING sink and
-   the stream flows through `MultiMedia1 → QUAT_TDM_RX_0`.
-3. **Codec side**: cs35l41 DAI probes, its DSP firmware
-   (`cs35l41-dsp1-spk-prot.wmfw`, v0.58.0) loads into both amps, the
-   codec driver enables the amp (`GLOBAL_EN=1`, `PLL_EN=1`, PLL source
-   SCLK) and then waits for power-up — `Enable(1) failed: -110` is the
-   PUP_DONE timeout, not a probe failure.
-4. **ADSP accepts all our commands**: port `DEVICE_START (0x100e5)` on
-   0x9030 returns success (after the race fix), clock votes on
-   `LPASS_CLK_ID_QUAD_TDM_IBIT` and `QUAD_MI2S_IBIT` return 0 at
-   1.536 MHz, MACRO/DCODEC core HW votes succeed, routing mixer accepts
-   the connection.
+## What was checked and eliminated
 
-## The smoking gun
-
-`scripts/pin-probe3.py` reads the **pad input** of LPI gpio0/1/2 via
-`/dev/mem` (keeping the func2 mux intact). During playback:
-
-```
-SCLK pin0 cfg=0x00000ec8 func=2 OE=1 ones=0/20000 transitions=0
-WS   pin1 cfg=0x00000ec8 func=2 OE=1 ones=0/20000 transitions=0
-DATA pin2 cfg=0x00000ec8 func=2 OE=1 ones=0/20000 transitions=0
-```
-
-Zero toggles on SCLK, WS **and** DATA. `pin-scan.py` confirms **no LPI
-pin of all 14** shows any activity during playback. The pad config
-register (0xec8 = func2, OE, 8 mA drive) is exactly what the DTS asked
-for. The pinmux is applied (debugfs pinmux-pins shows owner `sound`).
-
-In other words: **the physical output block is never enabled, even
-though the ADSP says "port started".**
-
-## The elimination matrix
+Verified on the device, mostly by poking registers over raw i2c and sampling
+pads through `/dev/mem`.
 
 | Hypothesis | Test | Result |
 |---|---|---|
-| Driver differs from mainline | 3-way diff vs torvalds + nikroks | identical INT_BOOST path; no PLL_LOCK refactor exists anywhere (the "mainline refactor" theory was wrong) |
-| Boost DT params wrong | vs vendor DTBO | identical (4000 mA / 1000 nH / 15 µF) |
-| Wrong port (TDM vs MI2S) | built & flashed both | same symptom; pins are shared |
-| Wrong sync-mode | tried 0 and 1 (vendor value) | same symptom |
-| Wrong BCLK rate | vote 12.288 MHz vs 1.536 MHz | **12.288 MHz → ADSP EBADPARAM; 1.536 MHz → accepted. Vendor DTBO value 1536000 is the only legal one — evidence the ADSP parses our votes** |
-| Wrong clock attribute | COUPLE_NO / INVERT_COUPLE_NO / couple | INVERT on TDM rejected (`-22`), COUPLE accepted, no output either way |
-| Missing core HW votes | extra MACRO/DCODEC votes | accepted (ret=0), no output |
-| Boot race left DSP wedged | full remoteproc stop/start, driver unbind/rebind | card recovers each time; pins still dead |
-| Wrong codec fmt | NB_NF\|DSP_A vs IB_NF\|DSP_B | IB_NF rejected by cs35l41 driver |
-| Wrong firmware | sha256 vs known-good copy | identical to the device-validated adsp.mbn (not the RB5 generic one) |
-| Userspace routing | PipeWire/UCM/paplay + direct speaker-test | both reach the codec; same failure |
+| Sound card does not register | boot logs | Registers every boot after patches 0001/0002 |
+| Userspace never reaches the codec | PipeWire / UCM / `paplay` / direct `speaker-test` | All reach the codec; DAPM powers the chain |
+| DAPM chain broken | `debugfs/asoc/.../dapm` | `AMP Playback`, `ASPRX1`, `DSP1`, `PCM Source`, `CLASS H`, `Main AMP`, `SPK` — all **On** |
+| Amp never enabled | `PWR_CTRL1/2/3` during playback | `0x2014=0x1`, `0x2018=0x3721` — the firmware raised `AMP_EN` and the boost itself after a mailbox RESUME |
+| Digital mute | `0x6000`, `0x2024` | `0x6000=0xbffc` (≈0 dB), `0x2024=0` (unmuted) |
+| Wrong DAC source | `0x4C00` | `0x32` = protection DSP, as intended |
+| Protection DSP faulted | `0x6418`, `0x640C`, `0x6410` | All zero |
+| BCLK missing | main-TLMM pad probe | SCK / WS / D1 all toggle during playback |
+| Wrong firmware | generic vs revb2 vendor | revb2 extracted from the vendor partition and loaded fine — same result |
+| `PUP_DONE` never set | raw i2c `IRQ1_STATUS1` | True for this firmware, but **not the cause** — power-up completes via bit 22 and the RESUME mailbox; patch 0005 handles it |
+| Digital volume | ALSA control | Default 0 = MUTE; max 913 **overflows** to code 96. Real 0 dB is **816**. A genuine second bug, but fixing it alone produced no sound |
 
-## The leading theory: missing ACDB upload
+Two red herrings cost the most time:
 
-Qualcomm's ADSP audio needs **calibration/topology data (ACDB)** pushed
-to it by the Android vendor audio HAL over ADM ioctls. On this device
-the data exists — `acdbdata/Forte/Forte_*.acdb` (we have it deployed at
-`/usr/share/qcom/sm8250/Xiaomi/alioth/acdbdata/`) — but mainline Linux
-has **no userspace that uploads it**, and the stock `adsp.mbn` seems to
-keep the LPASS output blocks gated until then.
+1. **Digital volume.** `SOC_SINGLE_SX_TLV` with `min=0x4CF`, `max=0x391`
+   overflows an 11-bit field: control value 913 (the advertised maximum) wraps
+   to register code 96, which is essentially muted. The useful value is 816.
+2. **VBST capture.** We built an entire capture path
+   (`TERTIARY_MI2S_TX` + `gpio134` + a `Tertiary MI2S Capture` DAI link) to
+   measure boost voltage and got exact zeros — because `gpio134` is a *data0
+   output* driven by the ADSP, never an input.
 
-Consistent observations:
+## The discovery
 
-- The ADSP accepts the clock vote only at the vendor rate (it parses,
-  but something upstream of the pad never turns on).
-- The port "starts" without error, yet no LPI pin moves — as if the
-  AFE-to-LPASS-hardware plumbing the ADSP would normally configure from
-  ACDB data is simply absent.
-- Nova-Deck's issue #94 (RB5 board, same ADSP generation) shows the same
-  "commands accepted, nothing happens" class of failure — theirs was
-  timing; ours persists after timing was fixed, which points at data.
+While dumping clock registers mid-playback:
 
-## What we could not do
+```
+0x2C04 (PLL_CLK_CTRL) = 0x670   -> REFCLK_FREQ field = 0x33 = 12 288 000 Hz
+```
 
-- Extract ACDB/vendor from Xiaomi's line-flash `super.img`: it uses the
-  **GDLA** container (`gDla4` magic + a byte-shuffled `ALP0`-variant LP
-  header); payload regions are high-entropy with no zstd/gzip/erofs/ext4
-  structure — effectively encrypted. (Doesn't matter — the ACDB files
-  are extractable from a rooted stock device or the Armada rootfs.)
-- Write a userspace ACDB uploader: the ADM ioctl protocol is not
-  documented; it would need reversing CodeLinaro's audio HAL. This is
-  where help would be most valuable.
+The actual bit clock is 1 536 000 Hz. Writing that register as `0x370`
+(source = SCLK, `REFCLK_FREQ = 0x1b` = 1 536 000 Hz) **during** a stream made
+sound appear instantly, reproducibly, twice.
 
-## How to reproduce / instrument
+Two follow-ups pinned down the fix:
 
-- Pin probe (needs root, /dev/mem):
-  `python3 scripts/pin-probe3.py playback` while a stream runs.
-- Amp registers:
-  `cat /sys/kernel/debug/regmap/3-0040/registers` (watch `0x2014`
-  GLOBAL_EN, `0x10010` PUP_DONE bit24, `0x10018` PLL_LOCK bit1).
-- Clock votes: watch `dmesg | grep qcom-q6afe` during stream start.
-- Full logs from our runs are summarized in the repository history of
-  this file; the tooling that produced them is in `scripts/`.
+- The PLL value is written once by the protection firmware at boot and is **not**
+  re-written when a stream starts, so setting it at stream start is stable —
+  verified by sampling the register across playback start.
+- The plain `cs35l41_component_set_sysclk()` sequence is sufficient; an extra
+  "PLL enable" bit is not needed (also verified audible).
 
-## Workaround
+## The fix
 
-USB-C audio (`CONFIG_SND_USB_AUDIO=m`) and Bluetooth (hci_qca) work; a
-USB-C DAC is the practical sound solution until the ACDB question is
-solved.
+`kernel/patches/0006-sm8250-cs35l41-audio.patch`:
+
+```c
+case TERTIARY_MI2S_RX:
+        ...
+        for_each_rtd_codec_dais(rtd, j, codec_dai) {
+                ret = snd_soc_component_set_sysclk(codec_dai->component,
+                                                   CS35L41_CLKID_SCLK, 0,
+                                                   MI2S_BCLK_RATE,   /* 1536000 */
+                                                   SNDRV_PCM_STREAM_PLAYBACK);
+                ...
+        }
+```
+
+Plus a frontend constraint (`sm8250_fe_startup`): 2 channels, 48 kHz,
+`S16_LE`. Without it the q6asm frontend advertises 1–8 channels and PipeWire
+negotiates an `s24-32le 8ch` sink, which never matched the hardware path — the
+desktop path was silent **and** the volume keys did nothing. With the
+constraint the sink becomes `s16le 2ch 48000Hz` and PipeWire's volume works.
+
+## The port we ended up on
+
+Four earlier rounds tried, in order: TERT TDM on LPASS LPI pins, QUAT TDM on
+LPI pins, TERT TDM on LPI `i2s2` pins, and finally **TERT MI2S on main-TLMM
+`mi2s2` pins** (gpio133/135/137) — which is what
+[xiongnemo/hakios-alioth](https://github.com/xiongnemo/hakios-alioth) uses on
+this board. Only that pin group produces a real BCLK; the LPI pin groups never
+moved at all. The vendor DTBO's `QUAT TDM` port and the working `TERT MI2S`
+port disagree — trust the working one.
+
+## Reproducing the diagnostics
+
+- PLL register: `0x2C04` on each amp over i2c — `(value >> 5) & 0x3f` is the
+  reference-clock code, `0x1b` = 1 536 000 Hz.
+- Any register: the scripts use raw `I2C_SLAVE_FORCE` + `I2C_RDWR` ioctls
+  because the kernel driver owns the address.
+- Pads: `scripts/pin-probe.py` reads main-TLMM `0x0f100000`, 0x1000 stride.
+- DAPM: `cat /sys/kernel/debug/asoc/xiaomi-alioth/cs35l41.3-0040/dapm/*`
+
+**Test with intermittent beeps, not a continuous sine.** A continuous tone is
+easy to confuse with the amp powering up and down; beeps with gaps are
+unambiguous:
+
+```bash
+python3 - <<'EOF'
+import wave, struct, math
+rate = 48000; n = 5
+beep = [struct.pack("<hh", v, v)
+        for v in [int(11000 * math.sin(2*math.pi*600*i/rate)) for i in range(rate)]]
+gap  = [struct.pack("<hh", 0, 0)] * int(rate * 0.7)
+w = wave.open("/tmp/beeps.wav", "wb")
+w.setnchannels(2); w.setsampwidth(2); w.setframerate(rate)
+w.writeframes((b"".join(beep) + b"".join(gap)) * n)
+w.close()
+EOF
+paplay /tmp/beeps.wav
+```
+
+## Known remaining wart
+
+`Digital PCM Volume` still advertises a maximum of 913 while the useful range
+ends at 816. Nothing is wrong with the driver per se — it is a
+`SOC_SINGLE_SX_TLV` definition straight from upstream — but any UI that ramps
+the control to its advertised maximum will mute the speaker. The UCM profile
+pins it at 816.

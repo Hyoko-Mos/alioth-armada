@@ -71,6 +71,23 @@ else
 fi
 cd "${SRC}"
 
+# ---- 1b. Alioth audio patches ------------------------------------------------
+# Straight from the device: the two CS35L41 amps hang off TERTIARY MI2S and
+# every DAPM widget powers up, yet nothing came out until these landed.
+#   0001  sm8250 machine driver: retarget the amp PLL from the protection
+#         firmware's 12.288 MHz default to the real TER_MI2S_IBIT (1.536 MHz)
+#         and pin the q6asm frontend to 48 kHz / S16 / 2ch so PipeWire builds a
+#         usable sink instead of an 8-channel s24-32le one.
+#   0002  cs35l41-lib: this B2 spk-prot firmware never raises PUP_DONE; use the
+#         RESUME/PAUSE mailbox for INT_BOOST instead of polling bit 24.
+if compgen -G "${SCRIPT_DIR}/patches/*.patch" >/dev/null; then
+    for p in "${SCRIPT_DIR}"/patches/*.patch; do
+        echo "==> Applying $(basename "$p")"
+        patch -p1 --forward -r - --fuzz=2 <"$p" ||
+            echo "WARN: $(basename "$p") did not apply cleanly" >&2
+    done
+fi
+
 # ---- 2. Config: alioth board config + armada fragment ------------------------
 [[ -f "${SCRIPT_DIR}/${KERNEL_CONFIG}" ]] || {
     echo "ERROR: ${KERNEL_CONFIG} missing; ship it alongside kernel-alioth/" >&2

@@ -1,0 +1,14 @@
+# Everything here is meant to run on Linux. Windows check-outs must not
+# rewrite line endings: CRLF in a shell script turns "#!" into "#!/bin/bash\r"
+# and the kernel refuses to exec it (the exact failure this repo documents).
+* text=auto eol=lf
+
+*.sh    text eol=lf
+*.py    text eol=lf
+*.conf  text eol=lf
+*.patch text eol=lf
+
+# Binary-ish artifacts: never touch them.
+*.bin   binary
+*.wmfw  binary
+*.img   binary
