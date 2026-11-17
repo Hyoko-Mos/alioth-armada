@@ -71,17 +71,45 @@ else
 fi
 cd "${SRC}"
 
-# ---- 1b. Alioth audio patches ------------------------------------------------
-# Straight from the device: the two CS35L41 amps hang off TERTIARY MI2S and
-# every DAPM widget powers up, yet nothing came out until these landed.
-#   0001  sm8250 machine driver: retarget the amp PLL from the protection
-#         firmware's 12.288 MHz default to the real TER_MI2S_IBIT (1.536 MHz)
-#         and pin the q6asm frontend to 48 kHz / S16 / 2ch so PipeWire builds a
-#         usable sink instead of an 8-channel s24-32le one.
-#   0002  cs35l41-lib: this B2 spk-prot firmware never raises PUP_DONE; use the
-#         RESUME/PAUSE mailbox for INT_BOOST instead of polling bit 24.
+# ---- 1b. Alioth patches ------------------------------------------------------
+# patches/*.patch are applied in filename order. Anything named
+# 90-optional-*.patch is a board configuration choice, NOT a fix; it is skipped
+# unless you opt in via ARMADA_OPTIONAL_PATCHES.
+#
+#   required (always applied)
+#     0001 q6afe   wait for the DSP audio services before populating children
+#     0002 q6core  do not treat a failed GET_STATE as "DSP is up"
+#     0003 q6asm-dai  unregister the component on remove
+#     0004 q6routing  unregister the component on remove
+#     0005 cs35l41-lib  RESUME/PAUSE mailbox instead of polling PUP_DONE
+#     0006 sm8250  retarget the amp PLL to the real BCLK + pin the FE format
+#     0007 DTS     TERT MI2S audio, pins, BT local-bd-address
+#
+#   optional (only with ARMADA_OPTIONAL_PATCHES=all or a matching name)
+#     90-optional-dts-battery-5000mah  design capacity for a replaced cell
+#
+# Example:  ARMADA_OPTIONAL_PATCHES=all bash kernel/build.sh out/
+#           ARMADA_OPTIONAL_PATCHES=battery bash kernel/build.sh out/
+OPT="${ARMADA_OPTIONAL_PATCHES:-}"
+
+should_apply() {
+    local base
+    base=$(basename "$1")
+    case "$base" in
+        *optional*) ;;
+        *) return 0 ;;
+    esac
+    [ "$OPT" = "all" ] && return 0
+    case "$base" in *"$OPT"*) [ -n "$OPT" ] && return 0 ;; esac
+    return 1
+}
+
 if compgen -G "${SCRIPT_DIR}/patches/*.patch" >/dev/null; then
     for p in "${SCRIPT_DIR}"/patches/*.patch; do
+        if ! should_apply "$p"; then
+            echo "==> Skipping $(basename "$p") (optional; set ARMADA_OPTIONAL_PATCHES)"
+            continue
+        fi
         echo "==> Applying $(basename "$p")"
         patch -p1 --forward -r - --fuzz=2 <"$p" ||
             echo "WARN: $(basename "$p") did not apply cleanly" >&2

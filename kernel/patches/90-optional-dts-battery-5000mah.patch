@@ -1,0 +1,24 @@
+--- a/arch/arm64/boot/dts/qcom/sm8250-xiaomi-alioth.dts	2026-11-14 18:34:03.545622630 +0800
++++ b/arch/arm64/boot/dts/qcom/sm8250-xiaomi-alioth.dts	2026-11-14 18:34:03.545764236 +0800
+@@ -50,11 +50,19 @@
+ 
+ 	battery: battery {
+ 		compatible = "simple-battery";
+-		charge-full-design-microamp-hours = <4520000>;
+-		energy-full-design-microwatt-hours = <17500000>;
++		/*
++		 * The stock cell is 4520 mAh; this unit has a 5000 mAh
++		 * replacement. Android needs a "de-containment" patch for that,
++		 * Linux only needs the design figures here or the fuel gauge
++		 * maps state-of-charge against the wrong capacity.
++		 * Energy scales with the capacity (5.0 Ah x 3.87 V ~ 19.35 Wh).
++		 */
++		charge-full-design-microamp-hours = <5000000>;
++		energy-full-design-microwatt-hours = <19350000>;
+ 		voltage-min-design-microvolt = <3400000>;
+ 		voltage-max-design-microvolt = <4460000>;
+ 	};
++
+ 	gpio_keys: gpio-keys {
+ 		compatible = "gpio-keys";
+ 

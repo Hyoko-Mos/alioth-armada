@@ -1,6 +1,14 @@
---- a/arch/arm64/boot/dts/qcom/sm8250-xiaomi-alioth.dts	2026-11-14 17:39:05.134525765 +0800
-+++ b/arch/arm64/boot/dts/qcom/sm8250-xiaomi-alioth.dts	2026-11-14 17:39:05.135248741 +0800
-@@ -758,6 +758,7 @@
+--- a/arch/arm64/boot/dts/qcom/sm8250-xiaomi-alioth.dts	2026-11-14 18:34:03.542125814 +0800
++++ b/arch/arm64/boot/dts/qcom/sm8250-xiaomi-alioth.dts	2026-11-14 18:34:03.542412271 +0800
+@@ -55,7 +55,6 @@
+ 		voltage-min-design-microvolt = <3400000>;
+ 		voltage-max-design-microvolt = <4460000>;
+ 	};
+-
+ 	gpio_keys: gpio-keys {
+ 		compatible = "gpio-keys";
+ 
+@@ -758,6 +757,7 @@
  	cs35l41_lcv: speaker-amp@41 {
  		compatible = "cirrus,cs35l41";
  		reg = <0x41>;
@@ -8,7 +16,7 @@
  		VA-supply = <&vreg_s4a_1p8>;
  		VP-supply = <&vph_pwr>;
  		interrupt-parent = <&tlmm>;
-@@ -1057,14 +1058,20 @@
+@@ -1057,14 +1057,20 @@
  };
  
  &q6afedai {
@@ -37,7 +45,7 @@
  	};
  };
  
-@@ -1079,14 +1086,49 @@
+@@ -1079,14 +1085,49 @@
  };
  
  &lpass_tlmm {
@@ -88,14 +96,15 @@
  
  	mm1-dai-link {
  		link-name = "MultiMedia1";
-@@ -1097,10 +1139,26 @@
+@@ -1097,10 +1138,26 @@
  	};
  
  	speaker-dai-link {
 -		link-name = "Tertiary TDM Playback";
 +		link-name = "Tertiary MI2S Playback";
-+
-+		cpu {
+ 
+ 		cpu {
+-			sound-dai = <&q6afedai TERTIARY_TDM_RX_0>;
 +			sound-dai = <&q6afedai TERTIARY_MI2S_RX>;
 +		};
 +
@@ -110,10 +119,24 @@
 +
 +	speaker-capture-dai-link {
 +		link-name = "Tertiary MI2S Capture";
- 
- 		cpu {
--			sound-dai = <&q6afedai TERTIARY_TDM_RX_0>;
++
++		cpu {
 +			sound-dai = <&q6afedai TERTIARY_MI2S_TX>;
  		};
  
  		platform {
+@@ -1283,6 +1340,14 @@
+ 
+ 	bluetooth {
+ 		compatible = "qcom,qca6390-bt";
++		/*
++		 * The QCA6390 ROM on these units reports an all-zero BD address,
++		 * which the kernel rejects (and bluez then hides the controller
++		 * as "unconfigured"). Inject a locally-administered address so
++		 * hci_dev_get_bd_addr_from_property() can configure it. The
++		 * 5A:AD tail is what this unit's ROM actually reports.
++		 */
++		local-bd-address = [02 00 00 00 5a ad];
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <&sw_ctrl>;
+ 		swctrl-gpios = <&tlmm 124 GPIO_ACTIVE_HIGH>;
