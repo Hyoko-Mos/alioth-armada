@@ -46,3 +46,18 @@ Keep the originals backed up — swapping them back is one `cp` each.
   stock device or from your previous rootfs instead.
 - `acdbdata/` is present but **not consumed** by mainline Linux (and not
   needed for the speaker fix documented here).
+
+## What the release `boot_b.img` expects
+
+The `boot_b.img` attached to the GitHub release is the image this device
+boots; it contains the kernel (6.15.1-armada), the DTB and the dracut
+initramfs, and nothing else. Firmware is **not** inside it — the kernel
+loads it from the root filesystem at run time, so the rootfs you build has
+to provide everything listed above. `vmlinuz` in the release manifest is
+the same compressed image (12 MB, gzip) with the DTB appended.
+
+If you build the rootfs yourself (see the README "Building" section and
+`device/52-alioth-device-fixes.sh`), the QCA6390 Wi-Fi/BT firmware must
+also be present under `qca/` (`htbtfw20.tlv`, `htnv20.bin`, `bdwlan*`,
+`qca6390` board data) — the BT address fix in patch 0007 only works after
+`QCA setup on UART is completed`.
